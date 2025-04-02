@@ -16,7 +16,7 @@ std::string apply_IP(const std::string& plaintext);
 std::string apply_IIP(const std::string& bit_stream);
 std::string apply_EP(const std::string& right);
 std::string apply_PC1(const std::string& key);
-void perform_DES();
+std::string perform_DES(const std::string& key_hex = "", const std::string& fileName = "");
 std::string round_function(const std::string& left32, const std::string& right32, const std::vector<std::string>& subkeys);
 std::string read_data(const std::string& fileName);
 void write_data(const std::string& fileName, const std::string& data);

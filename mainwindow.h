@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QTcpSocket>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
+#include <QDesktopServices>
+#include <QUrl>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,12 +22,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void connectToServer();  // Kết nối tới server
-    void chooseFile();       // Chọn file từ local
-    void sendFile();         // Gửi file tới server
-    void onConnected();      // Xử lý khi kết nối thành công
-    void onErrorOccurred(QAbstractSocket::SocketError socketError); // Xử lý lỗi
-    void onServerResponse(); // Nhận phản hồi từ server
+    void connectToServer();
+    void chooseFile();
+    void sendFile();
+    void on_btnEncrypt_clicked(); // Add this method
+    void onConnected();
+    void onErrorOccurred(QAbstractSocket::SocketError socketError);
+    void onServerResponse();
 
 private:
     Ui::MainWindow *ui;

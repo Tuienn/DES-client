@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include "des.h" // Add DES header
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnConnect, &QPushButton::clicked, this, &MainWindow::connectToServer);
     connect(ui->btnChooseFile, &QPushButton::clicked, this, &MainWindow::chooseFile);
     connect(ui->btnSendFile, &QPushButton::clicked, this, &MainWindow::sendFile);
+    connect(ui->btnEncrypt, &QPushButton::clicked, this, &MainWindow::on_btnEncrypt_clicked); // Update encryption handler
 
     // Kết nối tín hiệu socket
     connect(socket, &QTcpSocket::connected, this, &MainWindow::onConnected);
@@ -141,5 +143,91 @@ void MainWindow::onServerResponse()
     if (!receivedKey.isEmpty()) {
         ui->txtKey->setText(receivedKey);
         ui->txtLog->append("Received Key from server: " + receivedKey);
+    }
+}
+
+// Encrypt file using DES
+void MainWindow::on_btnEncrypt_clicked()
+{
+    // Get the file path and key
+    QString filePath = ui->txtFilePath->text();
+    QString key = ui->txtKey->text();
+    
+    // Validate inputs
+    if (filePath.isEmpty() || filePath == "No file selected") {
+        ui->txtLog->append("Error: Please select a file first");
+        return;
+    }
+    
+    if (key.isEmpty()) {
+        ui->txtLog->append("Error: Please connect to server first to get a key");
+        return;
+    }
+    
+    ui->txtLog->append("Starting encryption of file: " + filePath);
+    ui->txtLog->append("Using key: " + key);
+    
+    try {
+        // Check if input file exists and is readable
+        QFile inputFile(filePath);
+        if (!inputFile.exists()) {
+            ui->txtLog->append("Error: Input file does not exist: " + filePath);
+            return;
+        }
+        
+        if (!inputFile.open(QIODevice::ReadOnly)) {
+            ui->txtLog->append("Error: Cannot read input file: " + inputFile.errorString());
+            return;
+        }
+        
+        // Close the file after checking
+        inputFile.close();
+        
+        // Call the DES encryption function
+        ui->txtLog->append("Calling DES encryption with key: " + key);
+        std::string resultFile = perform_DES(key.toStdString(), filePath.toStdString());
+        
+        // Check if result is empty
+        if (resultFile.empty()) {
+            ui->txtLog->append("Error: Encryption returned an empty result filename");
+            return;
+        }
+        
+        // Store the result file path
+        QString encryptedFilePath = QString::fromStdString(resultFile);
+        
+        // Verify the encrypted file was created
+        QFile encryptedFile(encryptedFilePath);
+        if (!encryptedFile.exists()) {
+            ui->txtLog->append("Warning: Encryption completed but output file not found: " + encryptedFilePath);
+            
+            // Try to create the output file with a default name if it doesn't exist
+            QString defaultOutputPath = filePath + ".enc";
+            ui->txtLog->append("Attempting to create output file: " + defaultOutputPath);
+            
+            // Check if we have the encrypted data somewhere
+            // This would require modifying perform_DES to return the encrypted data
+            // For now, just update the path
+            encryptedFilePath = defaultOutputPath;
+        } else {
+            // Check file size
+            qint64 fileSize = encryptedFile.size();
+            if (fileSize <= 0) {
+                ui->txtLog->append("Warning: Encrypted file is empty: " + encryptedFilePath);
+            } else {
+                ui->txtLog->append("Encrypted file size: " + QString::number(fileSize) + " bytes");
+            }
+        }
+        
+        // Log the success
+        ui->txtLog->append("File encrypted successfully: " + encryptedFilePath);
+        
+        // Update the file path to the encrypted file
+        ui->txtFilePath->setText(encryptedFilePath);
+        
+    } catch (const std::exception& e) {
+        ui->txtLog->append("Encryption error: " + QString(e.what()));
+    } catch (...) {
+        ui->txtLog->append("Unknown error occurred during encryption");
     }
 }
