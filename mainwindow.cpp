@@ -169,19 +169,19 @@ void MainWindow::on_btnEncrypt_clicked()
     
     try {
         // Check if input file exists and is readable
-        QFile inputFile(filePath);
-        if (!inputFile.exists()) {
-            ui->txtLog->append("Error: Input file does not exist: " + filePath);
-            return;
-        }
+        // QFile inputFile(filePath);
+        // if (!inputFile.exists()) {
+        //     ui->txtLog->append("Error: Input file does not exist: " + filePath);
+        //     return;
+        // }
         
-        if (!inputFile.open(QIODevice::ReadOnly)) {
-            ui->txtLog->append("Error: Cannot read input file: " + inputFile.errorString());
-            return;
-        }
+        // if (!inputFile.open(QIODevice::ReadOnly)) {
+        //     ui->txtLog->append("Error: Cannot read input file: " + inputFile.errorString());
+        //     return;
+        // }
         
-        // Close the file after checking
-        inputFile.close();
+        // // Close the file after checking
+        // inputFile.close();
         
         // Call the DES encryption function
         ui->txtLog->append("Calling DES encryption with key: " + key);
@@ -193,37 +193,37 @@ void MainWindow::on_btnEncrypt_clicked()
             return;
         }
         
-        // Store the result file path
-        QString encryptedFilePath = QString::fromStdString(resultFile);
+        // // Store the result file path
+        // QString encryptedFilePath = QString::fromStdString(resultFile);
         
-        // Verify the encrypted file was created
-        QFile encryptedFile(encryptedFilePath);
-        if (!encryptedFile.exists()) {
-            ui->txtLog->append("Warning: Encryption completed but output file not found: " + encryptedFilePath);
+        // // Verify the encrypted file was created
+        // QFile encryptedFile(encryptedFilePath);
+        // if (!encryptedFile.exists()) {
+        //     ui->txtLog->append("Warning: Encryption completed but output file not found: " + encryptedFilePath);
             
-            // Try to create the output file with a default name if it doesn't exist
-            QString defaultOutputPath = filePath + ".enc";
-            ui->txtLog->append("Attempting to create output file: " + defaultOutputPath);
+        //     // Try to create the output file with a default name if it doesn't exist
+        //     QString defaultOutputPath = filePath + ".enc";
+        //     ui->txtLog->append("Attempting to create output file: " + defaultOutputPath);
             
-            // Check if we have the encrypted data somewhere
-            // This would require modifying perform_DES to return the encrypted data
-            // For now, just update the path
-            encryptedFilePath = defaultOutputPath;
-        } else {
-            // Check file size
-            qint64 fileSize = encryptedFile.size();
-            if (fileSize <= 0) {
-                ui->txtLog->append("Warning: Encrypted file is empty: " + encryptedFilePath);
-            } else {
-                ui->txtLog->append("Encrypted file size: " + QString::number(fileSize) + " bytes");
-            }
-        }
+        //     // Check if we have the encrypted data somewhere
+        //     // This would require modifying perform_DES to return the encrypted data
+        //     // For now, just update the path
+        //     encryptedFilePath = defaultOutputPath;
+        // } else {
+        //     // Check file size
+        //     qint64 fileSize = encryptedFile.size();
+        //     if (fileSize <= 0) {
+        //         ui->txtLog->append("Warning: Encrypted file is empty: " + encryptedFilePath);
+        //     } else {
+        //         ui->txtLog->append("Encrypted file size: " + QString::number(fileSize) + " bytes");
+        //     }
+        // }
         
-        // Log the success
-        ui->txtLog->append("File encrypted successfully: " + encryptedFilePath);
+        // // Log the success
+        // ui->txtLog->append("File encrypted successfully: " + encryptedFilePath);
         
-        // Update the file path to the encrypted file
-        ui->txtFilePath->setText(encryptedFilePath);
+        // // Update the file path to the encrypted file
+        // ui->txtFilePath->setText(encryptedFilePath);
         
     } catch (const std::exception& e) {
         ui->txtLog->append("Encryption error: " + QString(e.what()));
